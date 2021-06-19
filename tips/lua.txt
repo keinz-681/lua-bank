@@ -1,0 +1,467 @@
+luaの簡単なものを紹介。
+
+階乗を計算するコード
+
+#!/usr/bin/env lua
+
+function fact(n)
+  if n == 0 then
+    return 1
+  else
+    return n * fact(n - 1)
+  end
+end
+
+print("enter a numbrer: ")
+a = io.read("*number")
+print(fact(a))
+
+コメント
+--[[コメント]]
+一行コメント
+--コメント一行
+複数行コメント
+--[[
+複数行コメント
+]]--
+基本型は下記8種類。ちょっとした特徴も併記してみます。
+
+nil
+非値(non-value)をあらわす。変数を宣言した直後はnilとなっている。
+boolean
+true/false. 0と空文字はtrue
+number
+実数（倍精度浮動小数点数)を表す。Luaに整数型はない。
+string
+文字列連結は.. ex: print('a' .. 'b') -> ab
+userdata
+Cの任意のデータをLuaの変数に格納することができる（どういうことだろう）。
+function
+ファーストクラスの値なので、変数に格納したり、他の関数への引数として渡したり、返り値にすることができる。
+thread
+table
+可変長の連想配列。実質的にLuaの唯一のデータ構造化機構。
+もっとも単純なコンストラクタ式は a = {}
+配列を表現するには整数をキーにする。 配列のインデックスは1から始まるのが慣例 。
+# が要素の数を返す。 ex: print(a[#a]) -- リストaの最後の要素を出力
+ 
+
+
+
+LUAを組み込んだシステムはいろいろとあり、Robloxでも採用されています。
+
+
+ 
+
+文字操作
+連結は「..」を使います。
+
+s1 = "日本の首都は "
+s2 = "東京"
+S3 = s1 .. s2
+
+ 
+
+変数
+変数はint、stringなど区分せずに「local」でいくようです。
+
+local a= 1
+
+ 
+
+IF
+「if ～ then」「end」ではさみます。
+
+if x == 1 then
+
+　print("OK")
+
+end
+
+ 
+
+「&&」は「AND」、「||」は「OR」です。
+
+ 
+
+「elseif」も利用可能。
+
+ 
+
+「x ~= y」のように 「~=」が使われる場合があります。これはC言語などでは「！＝」であり、xがyと等しくないことを表します。
+
+ 
+
+関数
+関数も「local」として定義できます。
+
+local function sampleFunc(number)
+
+  return number + 1
+
+end
+
+ 
+
+ループ
+１から５までのループは以下のような「For」文です。
+
+for count = 1, 5 do
+
+　print(count)
+
+end
+
+ 
+
+「While」も利用可能。
+
+while true do
+
+　print("Looping...")
+
+　wait(0.5)
+
+end
+
+ 
+
+連想配列
+LUAではテーブルと呼ばれる形式を利用します。
+
+local dictionary = {
+
+　val1 = "A",
+
+　val2 = "B"
+
+}
+
+ 
+
+キーとして文字列が使われるとpairs関数でループできます。
+
+t = {}
+
+t["str1"] = "str1"
+
+t["str2"] = "str2"
+for i, ver in pairs(t) do
+
+    print(ver)
+
+end
+
+ 
+
+数字の場合はiparisを使います。
+
+t = {}
+
+t[0] = "str1"
+
+t[1] = "str2"
+for i, ver in iparis(t) do
+
+    print(ver)
+
+end
+
+ 
+
+ 
+
+スクリプト例
+タッチしたら実行
+タッチしたらヘルスが０になるスクリプトは以下のようになります。
+
+local trapPart = script.Parent
+
+local function onPartTouch(otherPart)
+
+　local partParent = otherPart.Parent
+
+　local humanoid = partParent:FindFirstChildWhichIsA("Humanoid")
+
+ 
+
+　if humanoid then
+
+　　humanoid.Health = 0
+
+　end
+
+end 
+
+trapPart.Touched:Connect(onPartTouch)
+
+ 
+
+ボタンを押したら
+ボックスをボタン代わりにしてタッチして反応するスクリプトは以下のようになります。
+
+関数を書いたら、ボタンが押されたときにその関数を実行するように接続します。
+
+local button = script.Parent
+
+ local function onButtonActivated()
+
+　print("Buttonがおされた!")
+
+end 
+
+button.Activated:Connect(onButtonActivated)
+
+
+ 
+ワークスペースは、作ったゲーム空間をひとまとめに指し示す元締めといったところでしょう。
+
+ 
+
+ゲーム開始時に実行するスクリプトは「SeverScriptService」という場所に格納するとよいでしょう。
+
+f:id:apicode:20210519100422p:plain
+
+ 
+
+ 
+
+重力を変更
+重力の値を変更すると、月のような世界が作れます。
+
+workspace.Gravity = 10
+
+
+
+
+ゲーム開始時の初期化
+「ServerScriptService」フォルダに追加したスクリプトにおいて、ユーザを調べたり属性を変更します。
+
+ 
+
+参加者の名前を出力する
+local Players = game:GetService("Players")
+
+Players.PlayerAdded:Connect(function(player)
+
+print(player.Name .. "が参加しました")
+
+end)
+
+ 
+
+Players.PlayerRemoving:Connect(function(player)
+
+print(player.Name .. "が離脱しました")
+
+end)
+
+ 
+
+ 
+
+移動のスクリプト
+触るとテレポート
+移動元のブロック（TP1）と、移動先のブロック（TP2）を用意しておきます。
+
+TP1にタッチしたら、アバターのCFrame(座標）をTP2へ移動します。
+
+local function doTeleport(part) 
+
+    local humanoid = part.Parent:FindFirstChild("HumanoidRootPart")
+
+    if humanoid then 
+
+       humanoid.CFrame = script.parent.TP2.CFrame + Vector3.new(0, 5, 0)
+
+    end
+
+end
+script.parent.TP1.Touched:Connect(doTeleport)
+
+ 
+
+触るとコンベイヤー
+上記移動スクリプトの応用例で、コンベイヤーベルト上で移動するような場合です。CFrameを少しづつ動かします。
+
+script.Parent.Touched:connect(function(hit)
+
+    local humanoid = hit.Parent:FindFirstChild("HumanoidRootPart")
+
+   if humanoid then
+
+      humanoid.CFrame = humanoid.CFrame + Vector3.new(0.3, 0, 0)
+
+　end
+
+end)
+
+ 
+
+触ると歩くスピードがアップ
+アバターの「WalkSpeed」を設定することで、早く走ったりゆっくり走ったりさせることができます。
+
+script.Parent.Touched:connect(function(hit)
+
+　　if hit and hit.Parent and hit.Parent:FindFirstChild("Humanoid") then 　　　　
+
+          hit.Parent.Humanoid.WalkSpeed = 50
+
+　　end
+
+end)
+
+ 
+
+触るとジャンプ
+触ったら「Jump 」をtrueにします。
+
+script.Parent.Touched:connect(function(hit)
+
+　　if hit and hit.Parent and hit.Parent:FindFirstChild("Humanoid") then 　　　　
+
+            hit.Parent.Humanoid.JumpPower = 100
+
+            hit.Parent.Humanoid.Jump = true
+
+　　end
+
+end)
+
+ 
+
+触ると死ぬ
+タッチしたアバターのHealthパラメータを0にします。
+
+script.Parent.Touched:connect(function(hit)
+
+　　if hit and hit.Parent and hit.Parent:FindFirstChild("Humanoid") then 　　　　hit.Parent.Humanoid.Health = 0
+
+　　end
+
+end)
+
+ 
+
+属性を変えるスクリプト
+顔のテクスチャを変更
+あらかじめ顔のアセットIDが必要。「http://www.roblox.com/asset/?id=7080078」へ変更するには以下のように書きます。
+
+実際にはDecalを活用して、IDの個所だけ外においていたほうが変更はしやすくなります。
+
+local head = script.Parent
+
+script.Parent.Touched:connect(function(hit)
+
+ 
+
+    local h = hit.Parent:findFirstChild("Humanoid")
+
+ 
+
+    if h~=nil then
+
+        if hit.Parent:findFirstChild("Head"):findFirstChild("face").Texture == nil then return end        hit.Parent:findFirstChild("Head"):findFirstChild("face").Texture="http://www.roblox.com/asset/?id=7080078"
+
+    end
+
+end
+
+ 
+
+ 
+
+その他
+f:id:apicode:20210519103344p:plain
+
+時間を夜にする
+Lighting（ライティング）」のところに「ClockTime（クロックタイム＝時刻）」があるので、それを0にセットすると夜になります。
+
+game.Lighting.ClockTime = 0
+
+オブジェクトを操る
+オブジェクトの中にscriptを書いて制御します。
+
+f:id:apicode:20210518092033p:plain
+
+ 
+
+物体自体は「script.Parent」として指定できます。
+
+ 
+
+点滅するオブジェクト
+オブジェクトの見える度を一定間隔でオンにしたりオフにしたりします。
+
+f:id:apicode:20210518092036p:plain
+
+ 
+
+ループ（繰り返し）させるので、「wait」で強制的に待機時間を追加しています。
+
+while true do
+
+  script.Parent.Transparency = 1
+
+  wait(1)
+
+  script.Parent.Transparency = 0
+
+  wait(1)
+
+end
+
+ 
+
+移動・回転するオブジェクト
+f:id:apicode:20210518093429p:plain
+
+scriptで回転させる場合、オブジェクトのCFrameに移動距離や角度をかけていきます。
+
+CFrameは「coordinate frame（座標フレーム）」のことで３D空間における位置や角度を表します。
+
+ 
+
+移動させる場合、移動用のCFrameを定義して現在のCFrameに追加します。
+
+local p=script.parent
+
+local cf = CFrame.new(1, 0, 0)
+
+while true do
+
+  p.CFrame = p.CFrame * cf
+
+  wait(0.5)
+
+end
+
+ 
+
+ 
+
+回転させる場合、角度のCFrameを作ります。４５度の場合ラジアン計算を組み込みます。
+
+local p=script.parent
+
+local cf = CFrame.Angles(0, math.rad(45), 0)
+
+while true do
+
+  p.CFrame = p.CFrame * cf
+
+  wait(0.5)
+
+end
+
+ 
+
+ベルトコンベヤー
+上に人が乗ると、人がベルトコンベヤーに乗った状態のようにオートで移動するスクリプトです。
+
+local conveyor = script.Parent
+conveyor.Velocity = conveyor.CFrame:vectorToWorldSpace(Vector3.new(0, 0, -10)) 
+
+この設定がアクティブになるには、オブジェクトが「Anchor」プロパティに設定されていることが必要です。 
+
+ 
